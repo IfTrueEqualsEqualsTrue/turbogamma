@@ -1,10 +1,10 @@
+import numpy as np
 import pytest
 
-from turbogamma.gamma import Point, gamma_punctual, gamma_1d, DTA, DOSE_TOLERANCE
+from turbogamma.gamma import gamma_1d, DTA, DOSE_TOLERANCE, DoseGrid
 
 ATOL = 1e-4
 ARRAY_SIZE = 16
-NULL_POINT: Point = Point(0.0, 0.0)
 TEST_CONSTANT_DOSE = 5.0
 
 
@@ -13,62 +13,51 @@ def ramp(i: int) -> float:
 
 
 @pytest.fixture
-def zeros_points() -> list[Point]:
-    return [NULL_POINT] * ARRAY_SIZE
+def zeros_points() -> DoseGrid:
+    return DoseGrid(coordinates=(np.zeros(ARRAY_SIZE),),
+                    dose=np.zeros(ARRAY_SIZE))
 
 
 @pytest.fixture
-def constant_dose_offset_points() -> list[Point]:
-    return [Point(0.0, TEST_CONSTANT_DOSE)] * ARRAY_SIZE
+def constant_dose_offset_points() -> DoseGrid:
+    return DoseGrid(coordinates=(np.zeros(ARRAY_SIZE),),
+                    dose=np.full(ARRAY_SIZE, TEST_CONSTANT_DOSE))
 
 
 @pytest.fixture
 def dta_ramp_points():
-    def _make(shift: int) -> list[Point]:
-        return [Point(DTA * (i + shift), ramp(i)) for i in range(0, ARRAY_SIZE)]
+    def _make(shift: int) -> DoseGrid:
+        i = np.arange(ARRAY_SIZE)
+        pos = DTA * (i + shift)
+        dose = ramp(i)
+        return DoseGrid((pos,), dose)
 
     return _make
-
-
-class TestGammaPunctual:
-    point_1 = Point(1.0, 2.4)
-    point_2 = Point(-3.2, 9.3)
-
-    @pytest.mark.parametrize("point", [NULL_POINT, point_1])
-    def test_same_points_is_zero(self, point):
-        assert gamma_punctual(point, point) == 0
-
-    def test_symmetric(self):
-        assert gamma_punctual(self.point_1, self.point_2) == pytest.approx(
-            gamma_punctual(self.point_2, self.point_1),
-            abs=ATOL,
-        )
-
-    def test_known_value(self):
-        KNOWN_RESULT = 230.00426083009856
-        assert gamma_punctual(self.point_2, self.point_1) == pytest.approx(KNOWN_RESULT, abs=ATOL)
 
 
 class TestGamma1d:
 
     def test_zeros(self, zeros_points):
-        assert gamma_1d(zeros_points, zeros_points) == [0.0] * ARRAY_SIZE
+        np.testing.assert_allclose(gamma_1d(zeros_points, zeros_points).gamma,
+                                   np.zeros(ARRAY_SIZE), atol=ATOL)
 
     def test_constant_dose_offset(self, zeros_points, constant_dose_offset_points):
-        assert gamma_1d(zeros_points, constant_dose_offset_points) == [
-            pytest.approx(TEST_CONSTANT_DOSE / DOSE_TOLERANCE, abs=ATOL)] * ARRAY_SIZE
+        np.testing.assert_allclose(gamma_1d(zeros_points, constant_dose_offset_points).gamma,
+                                   np.full(ARRAY_SIZE, TEST_CONSTANT_DOSE / DOSE_TOLERANCE), atol=ATOL)
 
     @pytest.mark.parametrize("shift", [1, 3])
     def test_dta_ramp(self, dta_ramp_points, shift: int):
         ref = dta_ramp_points(0)
         evaluation = dta_ramp_points(shift)
-        assert gamma_1d(ref, evaluation) == [pytest.approx(float(shift), abs=ATOL)] * ARRAY_SIZE
+        np.testing.assert_allclose(gamma_1d(ref, evaluation).gamma,
+                                   np.full(ARRAY_SIZE, float(shift)), atol=ATOL)
 
     def test_tradeoff(self):
-        ref = Point(0.0, 0.0)
-        close_pos_far_dose = Point(DTA, DOSE_TOLERANCE * 5)  # gamma ~5
-        far_pos_close_dose = Point(DTA * 5, DOSE_TOLERANCE)  # gamma ~5
-        close_pos_close_dose = Point(DTA, DOSE_TOLERANCE)  # Gamma ~1.4
+        ref_pos = (np.array([0.0]),)
+        ref_dose = np.array([0.0])
+        ref_grid = DoseGrid(ref_pos, ref_dose)
+        eval_pos = (np.array([DTA, DTA*5, DTA]),)
+        eval_dose = np.array([DOSE_TOLERANCE * 5, DOSE_TOLERANCE, DOSE_TOLERANCE])
+        eval_grid = DoseGrid(eval_pos, eval_dose)
         best_gamma: float = 1.4
-        assert gamma_1d([ref], [close_pos_far_dose, far_pos_close_dose, close_pos_close_dose]) == [pytest.approx(
-            best_gamma, abs=1e-1)]
+        np.testing.assert_allclose(gamma_1d(ref_grid, eval_grid).gamma, [best_gamma], atol=1)

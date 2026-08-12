@@ -1,28 +1,31 @@
-from math import sqrt
+from dataclasses import dataclass
+
+import numpy as np
 
 DOSE_TOLERANCE = 0.02
 DTA = 2
 
 
-class Point:
-    def __init__(self, position: float, dose: float):
-        self.position = position
-        self.dose = dose
+@dataclass
+class DoseGrid:
+    coordinates: tuple[np.ndarray]
+    dose: np.ndarray
 
 
-def gamma_punctual(reference_point: Point, evaluation_point: Point) -> float:
-    return sqrt(((reference_point.dose - evaluation_point.dose) / DOSE_TOLERANCE) ** 2 +
-                ((reference_point.position - evaluation_point.position) / DTA) ** 2)
+@dataclass
+class GammaResult:
+    ref_grid: DoseGrid
+    eval_grid: DoseGrid
+    gamma: np.ndarray
 
 
-def gamma_1d(reference_points: list[Point], evaluation_points: list[Point]) -> list[float]:
-    gammas: list[float] = []
-    for ref in reference_points:
-        min_gamma: float = float('inf')
-        for evaluation in evaluation_points:
-            punctual_gamma: float = gamma_punctual(ref, evaluation)
-            if punctual_gamma < min_gamma:
-                min_gamma = punctual_gamma
-        gammas.append(min_gamma)
-    return gammas
-
+def gamma_1d(ref_grid: DoseGrid, eval_grid: DoseGrid) -> GammaResult:
+    ref_pos_row = ref_grid.coordinates[0]
+    ref_pos_col = ref_pos_row.reshape((len(ref_pos_row), 1))
+    eval_pos_row = eval_grid.coordinates[0]
+    ref_dose_col = ref_grid.dose.reshape((len(ref_pos_row), 1))
+    dose_diff = ref_dose_col - eval_grid.dose
+    pos_diff = ref_pos_col - eval_pos_row
+    gammas: np.ndarray = np.sqrt((dose_diff / DOSE_TOLERANCE) ** 2 + (pos_diff / DTA) ** 2)
+    gamma = gammas.min(axis=1)
+    return GammaResult(ref_grid, eval_grid, gamma)
