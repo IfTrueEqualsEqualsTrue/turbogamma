@@ -1,9 +1,12 @@
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import QuadMesh
+from mpl_toolkits.mplot3d.art3d import Path3DCollection
 
-from scripts.providers import GammaProvider2d, GammaProvider1d
-from turbogamma.gamma import DoseGrid, GammaResult, gamma_1d, gamma_2d
-from turbogamma.scenarios import Scenarios1d, Scenarios2d
+from scripts.providers import GammaProvider2d, GammaProvider1d, GammaProvider3d
+from turbogamma.gamma import DoseGrid, GammaResult
+
+POINT_SIZE = 100
 
 
 def plot_dose_1d(ax: plt.Axes, grid: DoseGrid, title: str = "") -> None:
@@ -36,9 +39,30 @@ def plot_gamma_2d(ax: plt.Axes, gamma_result: GammaResult, title: str = "") -> Q
     return mesh
 
 
+def _scatter_volume(ax: plt.Axes, coordinates: tuple[np.ndarray], values: np.ndarray,
+                    title: str) -> Path3DCollection:
+    xx, yy, zz = np.meshgrid(*coordinates, indexing="ij")
+    scatter = ax.scatter(xx.flatten(), yy.flatten(), zz.flatten(),
+                         c=values.flatten(), s=POINT_SIZE, marker=".")
+    ax.set_title(title)
+    ax.set_xlabel("Distance in mm")
+    ax.set_ylabel("Distance in mm")
+    ax.set_zlabel("Distance in mm")
+    return scatter
+
+
+def plot_dose_3d(ax: plt.Axes, grid: DoseGrid, title: str = "") -> Path3DCollection:
+    return _scatter_volume(ax, grid.coordinates, grid.dose, title)
+
+
+def plot_gamma_3d(ax: plt.Axes, gamma_result: GammaResult, title: str = "") -> Path3DCollection:
+    return _scatter_volume(ax, gamma_result.ref_grid.coordinates, gamma_result.gamma, title)
+
+
 def plot_gamma_test(gamma_result: GammaResult) -> None:
-    fig, axes = plt.subplots(2, 2, figsize=(10, 8), constrained_layout=True)
     dimension = len(gamma_result.ref_grid.coordinates)
+    subplot_kw = {"projection": "3d"} if dimension == 3 else {}
+    fig, axes = plt.subplots(2, 2, figsize=(10, 8), constrained_layout=True, subplot_kw=subplot_kw)
     if dimension == 1:
         plot_dose_1d(axes[0, 0], gamma_result.ref_grid, "Reference dose")
         plot_dose_1d(axes[0, 1], gamma_result.eval_grid, "Evaluation dose")
@@ -47,6 +71,12 @@ def plot_gamma_test(gamma_result: GammaResult) -> None:
         mesh_dose = plot_dose_2d(axes[0, 0], gamma_result.ref_grid, "Reference dose")
         plot_dose_2d(axes[0, 1], gamma_result.eval_grid, "Evaluation dose")
         mesh_gamma = plot_gamma_2d(axes[1, 0], gamma_result, "Gamma map")
+        fig.colorbar(mesh_dose, ax=[axes[0, 0], axes[0, 1]])
+        fig.colorbar(mesh_gamma, ax=[axes[1, 0], axes[1, 1]])
+    elif dimension == 3:
+        mesh_dose = plot_dose_3d(axes[0, 0], gamma_result.ref_grid, "Reference dose")
+        plot_dose_3d(axes[0, 1], gamma_result.eval_grid, "Evaluation dose")
+        mesh_gamma = plot_gamma_3d(axes[1, 0], gamma_result, "Gamma map")
         fig.colorbar(mesh_dose, ax=[axes[0, 0], axes[0, 1]])
         fig.colorbar(mesh_gamma, ax=[axes[1, 0], axes[1, 1]])
     # plt.tight_layout()
@@ -63,4 +93,9 @@ def main_2d() -> None:
     plot_gamma_test(gamma)
 
 
-main_2d()
+def main_3d() -> None:
+    gamma = GammaProvider3d.get_square_feature(16, 2.0, 5)
+    plot_gamma_test(gamma)
+
+
+main_3d()

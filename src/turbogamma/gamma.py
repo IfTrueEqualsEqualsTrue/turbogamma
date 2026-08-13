@@ -67,7 +67,7 @@ def gamma_3d(ref_grid: DoseGrid, eval_grid: DoseGrid, dose_tolerance_abs: float 
     xx_pos_ref, yy_pos_ref, zz_pos_ref = np.meshgrid(*ref_grid.coordinates, indexing='ij')
     pos_ref_flatten = np.stack([xx_pos_ref.flatten(), yy_pos_ref.flatten(), zz_pos_ref.flatten()], axis=-1)
 
-    xx_pos_eval, yy_pos_eval, zz_pos_eval = np.meshgrid(*ref_grid.coordinates, indexing='ij')
+    xx_pos_eval, yy_pos_eval, zz_pos_eval = np.meshgrid(*eval_grid.coordinates, indexing='ij')
     pos_eval_flatten = np.stack([xx_pos_eval.flatten(), yy_pos_eval.flatten(), zz_pos_eval.flatten()], axis=-1)
 
     dist_diff = pos_ref_flatten[:, None, :] - pos_eval_flatten
