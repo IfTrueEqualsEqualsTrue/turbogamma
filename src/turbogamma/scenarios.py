@@ -17,7 +17,7 @@ class Scenarios1d:
         return _make
 
     @staticmethod
-    def build_uniform_feature(size: int, constant_dose: float) -> Callable:
+    def build_square_feature(size: int, constant_dose: float) -> Callable:
         def _make(shift: int) -> DoseGrid:
             i = np.arange(size)
             pos = DTA * i
@@ -35,10 +35,6 @@ class Scenarios1d:
 class Scenarios2d:
 
     @staticmethod
-    def build_zeros(size: int) -> DoseGrid:
-        return DoseGrid(coordinates=(np.zeros(size), np.zeros(size)), dose=np.zeros((size, size)))
-
-    @staticmethod
     def build_constant_dose(size: int, ) -> Callable:
         def _make(dose: float):
             i = np.arange(size)
@@ -48,7 +44,7 @@ class Scenarios2d:
         return _make
 
     @staticmethod
-    def build_uniform_feature(size: int, constant_dose: float) -> Callable:
+    def build_square_feature(size: int, constant_dose: float) -> Callable:
         def _make(shift: int) -> DoseGrid:
             i = np.arange(size)
             ix, iy = np.meshgrid(i, i, indexing="ij")

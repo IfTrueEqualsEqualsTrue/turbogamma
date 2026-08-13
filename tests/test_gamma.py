@@ -25,7 +25,7 @@ def constant_dose_grid() -> Callable:
 
 class TestGamma1d:
 
-    def test_unfiorm_dose_offset(self, constant_dose_line):
+    def test_uniform_dose_offset(self, constant_dose_line):
         base_dose = constant_dose_line(BASE_CONSTANT_DOSE)
         offset_dose = constant_dose_line(BASE_CONSTANT_DOSE + CONSTANT_DOSE_OFFSET)
         np.testing.assert_allclose(gamma_1d(base_dose, offset_dose, DOSE_TOLERANCE_ABS).gamma,
@@ -41,7 +41,7 @@ class TestGamma1d:
 
 class TestGamma2d:
 
-    def test_unfiorm_dose_offset(self, constant_dose_grid):
+    def test_uniform_dose_offset(self, constant_dose_grid):
         base_dose = constant_dose_grid(BASE_CONSTANT_DOSE)
         offset_dose = constant_dose_grid(BASE_CONSTANT_DOSE + CONSTANT_DOSE_OFFSET)
         np.testing.assert_allclose(gamma_1d(base_dose, offset_dose, DOSE_TOLERANCE_ABS).gamma,

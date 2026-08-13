@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.collections import QuadMesh
 
+from scripts.providers import GammaProvider2d, GammaProvider1d
 from turbogamma.gamma import DoseGrid, GammaResult, gamma_1d, gamma_2d
 from turbogamma.scenarios import Scenarios1d, Scenarios2d
 
@@ -53,20 +54,12 @@ def plot_gamma_test(gamma_result: GammaResult) -> None:
 
 
 def main_1d() -> None:
-    size = 16
-    uniform_dose_builder = Scenarios1d.build_constant_dose(size)
-    ref_grid = uniform_dose_builder(2.0)
-    offset_grid = uniform_dose_builder(3.0)
-    gamma = gamma_1d(ref_grid, offset_grid)
+    gamma = GammaProvider1d.get_square_feature(16, 2.0, 5)
     plot_gamma_test(gamma)
 
 
 def main_2d() -> None:
-    size = 16
-    uniform_dose_builder = Scenarios2d.build_constant_dose(size)
-    ref_grid = uniform_dose_builder(2.0)
-    offset_grid = uniform_dose_builder(3.0)
-    gamma = gamma_2d(ref_grid, offset_grid)
+    gamma = GammaProvider2d.get_square_feature(16, 2.0, 5)
     plot_gamma_test(gamma)
 
 
