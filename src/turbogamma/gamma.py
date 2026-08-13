@@ -19,8 +19,10 @@ class GammaResult:
     gamma: np.ndarray
 
 
-def gamma_1d(ref_grid: DoseGrid, eval_grid: DoseGrid) -> GammaResult:
-    dose_tolerance_abs = DOSE_TOLERANCE_PERCENT * ref_grid.dose.max()
+def gamma_1d(ref_grid: DoseGrid, eval_grid: DoseGrid, dose_tolerance_abs: float = None) -> GammaResult:
+    if not dose_tolerance_abs:
+        dose_tolerance_abs = DOSE_TOLERANCE_PERCENT * ref_grid.dose.max()
+
     ref_pos_row = ref_grid.coordinates[0]
     ref_pos_col = ref_pos_row.reshape((len(ref_pos_row), 1))
     eval_pos_row = eval_grid.coordinates[0]
@@ -32,7 +34,10 @@ def gamma_1d(ref_grid: DoseGrid, eval_grid: DoseGrid) -> GammaResult:
     return GammaResult(ref_grid, eval_grid, gamma)
 
 
-def gamma_2d(ref_grid: DoseGrid, eval_grid: DoseGrid) -> GammaResult:
+def gamma_2d(ref_grid: DoseGrid, eval_grid: DoseGrid, dose_tolerance_abs: float = None) -> GammaResult:
+    if not dose_tolerance_abs:
+        dose_tolerance_abs = DOSE_TOLERANCE_PERCENT * ref_grid.dose.max()
+
     # Position first
     xx_pos_ref, yy_pos_ref = np.meshgrid(ref_grid.coordinates[0], ref_grid.coordinates[1], indexing='ij')
     pos_ref_flatten = np.stack([xx_pos_ref.flatten(), yy_pos_ref.flatten()], axis=-1)
@@ -44,13 +49,11 @@ def gamma_2d(ref_grid: DoseGrid, eval_grid: DoseGrid) -> GammaResult:
     sq_dist = (dist_diff ** 2).sum(axis=-1)
 
     # Dose then
-
     dose_ref_flatten = ref_grid.dose.flatten()
     dose_eval_flatten = eval_grid.dose.flatten()
     dose_diff = dose_ref_flatten[:, None] - dose_eval_flatten
 
-    dose_tolerance_abs = DOSE_TOLERANCE_PERCENT * ref_grid.dose.max()
-
     gammas = np.sqrt((dose_diff / dose_tolerance_abs) ** 2 + (np.sqrt(sq_dist) / DTA) ** 2)
     gamma = gammas.min(axis=1).reshape(ref_grid.dose.shape)
+
     return GammaResult(ref_grid, eval_grid, gamma)

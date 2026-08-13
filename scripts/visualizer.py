@@ -53,23 +53,20 @@ def plot_gamma_test(gamma_result: GammaResult) -> None:
 
 
 def main_1d() -> None:
-    size = 64
-    constant_dose = 5.0
-    ref_func = Scenarios1d.build_uniform_feature(size, constant_dose)
-    evaluated_func = Scenarios1d.build_uniform_feature(size, constant_dose)
-    ref_grid = ref_func(0)
-    eval_grid = evaluated_func(5)
-    gamma = gamma_1d(ref_grid, eval_grid)
+    size = 16
+    uniform_dose_builder = Scenarios1d.build_constant_dose(size)
+    ref_grid = uniform_dose_builder(2.0)
+    offset_grid = uniform_dose_builder(3.0)
+    gamma = gamma_1d(ref_grid, offset_grid)
     plot_gamma_test(gamma)
 
 
 def main_2d() -> None:
-    size = 64
-    constant_dose = 5.0
-    ramp_func = Scenarios2d.build_uniform_feature(size, constant_dose)
-    ref_grid = ramp_func(0)
-    eval_grid = ramp_func(5)
-    gamma = gamma_2d(ref_grid, eval_grid)
+    size = 16
+    uniform_dose_builder = Scenarios2d.build_constant_dose(size)
+    ref_grid = uniform_dose_builder(2.0)
+    offset_grid = uniform_dose_builder(3.0)
+    gamma = gamma_2d(ref_grid, offset_grid)
     plot_gamma_test(gamma)
 
 
