@@ -20,7 +20,7 @@ class GammaResult:
 
 
 def gamma_1d(ref_grid: DoseGrid, eval_grid: DoseGrid, dose_tolerance_abs: float = None) -> GammaResult:
-    if not dose_tolerance_abs:
+    if dose_tolerance_abs is None:
         dose_tolerance_abs = DOSE_TOLERANCE_PERCENT * ref_grid.dose.max()
 
     ref_pos_row = ref_grid.coordinates[0]
@@ -35,7 +35,7 @@ def gamma_1d(ref_grid: DoseGrid, eval_grid: DoseGrid, dose_tolerance_abs: float 
 
 
 def gamma_2d(ref_grid: DoseGrid, eval_grid: DoseGrid, dose_tolerance_abs: float = None) -> GammaResult:
-    if not dose_tolerance_abs:
+    if dose_tolerance_abs is None:
         dose_tolerance_abs = DOSE_TOLERANCE_PERCENT * ref_grid.dose.max()
 
     # Position first
@@ -60,7 +60,7 @@ def gamma_2d(ref_grid: DoseGrid, eval_grid: DoseGrid, dose_tolerance_abs: float 
 
 
 def gamma_3d(ref_grid: DoseGrid, eval_grid: DoseGrid, dose_tolerance_abs: float = None) -> GammaResult:
-    if not dose_tolerance_abs:
+    if dose_tolerance_abs is None:
         dose_tolerance_abs = DOSE_TOLERANCE_PERCENT * ref_grid.dose.max()
 
     # Position first

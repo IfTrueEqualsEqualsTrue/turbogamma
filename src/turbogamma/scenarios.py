@@ -54,7 +54,7 @@ class Scenarios2d:
             start = (size - feature_width) // 2
             mask = (ix >= start + shift) & (iy >= start + shift) & (ix < start + shift + feature_width) & (
                     iy < start + shift + feature_width)
-            dose = np.where(mask, constant_dose, 1.0)
+            dose = np.where(mask, constant_dose, 0.0)
             return DoseGrid((pos, pos,), dose)
 
         return _make
@@ -86,7 +86,7 @@ class Scenarios3d:
                     (ix < start + shift + feature_width) &
                     (iy < start + shift + feature_width) &
                     (iz < start + shift + feature_width))
-            dose = np.where(mask, constant_dose, 1.0)
+            dose = np.where(mask, constant_dose, 0.0)
             return DoseGrid((pos, pos, pos), dose)
 
         return _make
