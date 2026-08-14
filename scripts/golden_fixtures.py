@@ -3,11 +3,11 @@ from pathlib import Path
 
 import numpy as np
 
-from scripts.pmp_gamma import OUTPUT_DIR, Protocol, compute_gammas, protocol_regular
-from turbogamma.gamma import GammaResult, DoseGrid
+from scripts.pmp_gamma import OUTPUT_DIR, compute_gammas, protocol_regular
+from turbogamma.gamma import GammaResult, DoseGrid, Protocol
 
 
-def load_2d_fixtures(protocol: Protocol) -> dict[str, GammaResult]:
+def load_fixtures(protocol: Protocol) -> dict[str, GammaResult]:
     protocol_dir = protocol.folder_name()
     if not protocol_dir in os.listdir(OUTPUT_DIR):
         compute_gammas(protocol)

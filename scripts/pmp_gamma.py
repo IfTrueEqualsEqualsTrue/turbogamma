@@ -2,14 +2,14 @@ import json
 import os
 import re
 import struct
-from dataclasses import dataclass, asdict
+from dataclasses import asdict
 from pathlib import Path
 
 import numpy as np
 import pymedphys as pmp
 
 from scripts.epi import read_epi_content_file
-from turbogamma.gamma import DoseGrid, GammaResult
+from turbogamma.gamma import DoseGrid, GammaResult, Protocol
 
 banned_fixtures = [5, 7, 9, 14, 16, ]
 
@@ -18,27 +18,6 @@ DEFAULT_MAX_GAMMA = 3
 FIXTURE_DIR = os.path.join("..", "tests", "golden_fixtures")
 INPUT_DIR = os.path.join(FIXTURE_DIR, "input")
 OUTPUT_DIR = os.path.join(FIXTURE_DIR, "output")
-
-
-@dataclass
-class Protocol:
-    dose_difference: float
-    dta: float
-    dose_threshold: float
-    local: bool = False
-    interp_fraction: float = 10
-    max_gamma: float = 3
-
-    def folder_name(self) -> str:
-        return (
-            f"dd{self.dose_difference:g}"
-            f"_dta{self.dta:g}"
-            f"_dt{self.dose_threshold:g}"
-            f"_local{int(self.local)}"
-            f"_if{self.interp_fraction:g}"
-            f"_g{self.max_gamma:g}"
-        )
-
 
 protocol_regular = Protocol(dose_difference=3, dta=3, dose_threshold=20)
 
