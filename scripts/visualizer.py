@@ -3,8 +3,10 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import QuadMesh
 from mpl_toolkits.mplot3d.art3d import Path3DCollection
 
+from scripts.golden_fixtures import load_2d_fixtures
+from scripts.pmp_gamma import protocol_regular
 from scripts.providers import GammaProvider2d, GammaProvider1d, GammaProvider3d
-from turbogamma.gamma import DoseGrid, GammaResult
+from turbogamma.gamma import DoseGrid, GammaResult, gamma_2d
 
 POINT_SIZE = 100
 
@@ -89,7 +91,10 @@ def main_1d() -> None:
 
 
 def main_2d() -> None:
-    gamma = GammaProvider2d.get_square_feature(16, 2.0, 5)
+    # gamma = GammaProvider2d.get_square_feature(16, 2.0, 5)
+    gammas = load_2d_fixtures(protocol_regular)
+    target = gammas["11_1"]
+    gamma = gamma_2d(target.ref_grid, target.eval_grid)
     plot_gamma_test(gamma)
 
 
@@ -98,4 +103,5 @@ def main_3d() -> None:
     plot_gamma_test(gamma)
 
 
-main_3d()
+
+main_2d()

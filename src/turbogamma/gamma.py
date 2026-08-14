@@ -17,6 +17,7 @@ class GammaResult:
     ref_grid: DoseGrid
     eval_grid: DoseGrid
     gamma: np.ndarray
+    id: str = ""
 
 
 def gamma_1d(ref_grid: DoseGrid, eval_grid: DoseGrid, dose_tolerance_abs: float = None) -> GammaResult:

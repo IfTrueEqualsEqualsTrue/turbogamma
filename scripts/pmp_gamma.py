@@ -40,6 +40,9 @@ class Protocol:
         )
 
 
+protocol_regular = Protocol(dose_difference=3, dta=3, dose_threshold=20)
+
+
 # pip install pymedphys[tests]==0.41.0
 def compute_gamma_from_arrays(ref_grid: DoseGrid,
                               eval_grid: DoseGrid,
@@ -162,10 +165,6 @@ class GammaComputation:
         eval_axes_dict = {f"eval_axis_{i}": axis for i, axis in enumerate(self.eval_grid.coordinates)}
         np.savez(f"{self.filename}.npz", ref_dose=self.ref_grid.dose, eval_dose=self.eval_grid.dose,
                  gamma=self.gamma_result.gamma, **ref_axes_dict, **eval_axes_dict)
-        with open(f"{self.filename}_meta.json", "w") as f:
-            meta = asdict(self.protocol)
-            meta["prefix"] = self.prefix
-            json.dump(meta, f)
 
     def run(self):
         self.build_dose_maps()
@@ -183,9 +182,7 @@ def find_fixture_pairs(input_dir: Path) -> dict[str, dict[str, Path]]:
     return pairs
 
 
-if __name__ == "__main__":
-    protocol = Protocol(dose_difference=3, dta=3, dose_threshold=20)
-
+def compute_gammas(protocol: Protocol) -> None:
     for prefix, files in find_fixture_pairs(INPUT_DIR).items():
         if "ref" not in files or "eval" not in files:
             print(f"skipping {prefix}: incomplete pair ({files})")
@@ -195,4 +192,13 @@ if __name__ == "__main__":
 
         computation = GammaComputation(files["ref"], files["eval"], protocol, prefix)
         computation.run()
+
         print(f"done: {prefix}")
+
+    with open(os.path.join(OUTPUT_DIR, protocol.folder_name(), "meta.json"), "w") as f:
+        meta = asdict(protocol)
+        json.dump(meta, f)
+
+
+if __name__ == "__main__":
+    compute_gammas(protocol_regular)
