@@ -1,9 +1,10 @@
+from math import sqrt
 from dataclasses import dataclass
 
 import numpy as np
 
-DOSE_TOLERANCE_PERCENT = 2
-DTA = 2
+ABSOLUTE_DOSE_TOLERANCE = 4 * sqrt(2)
+SPACING = 0.5
 
 
 @dataclass
@@ -14,6 +15,7 @@ class Protocol:
     local: bool = False
     interp_fraction: float = 10
     max_gamma: float = 3
+    dose_tolerance_abs: float | None = None
 
     def folder_name(self) -> str:
         return (

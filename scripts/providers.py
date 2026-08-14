@@ -1,57 +1,50 @@
-from turbogamma.gamma_bruteforce import gamma_bruteforce_2d, gamma_bruteforce_1d, gamma_bruteforce_3d
-from turbogamma.classes import GammaResult
-from turbogamma.scenarios import Scenarios2d, Scenarios1d, Scenarios3d
+from dataclasses import replace
+from typing import Callable
+
+from turbogamma.classes import DoseGrid, GammaResult, Protocol, protocol_regular, ABSOLUTE_DOSE_TOLERANCE
+from turbogamma.gamma_bruteforce import gamma_bruteforce_1d, gamma_bruteforce_2d, gamma_bruteforce_3d
+from turbogamma.scenarios import Scenarios1d, Scenarios2d, Scenarios3d
 
 
-class GammaProvider1d:
+class GammaProvider:
+    builder = None
+    gamma_func: Callable[[DoseGrid, DoseGrid, Protocol], GammaResult]
+    protocol: Protocol = protocol_regular
 
-    @staticmethod
-    def get_uniform_offset(size: int, dose_ref: float, dose_eval: float) -> GammaResult:
-        uniform_dose_builder = Scenarios1d.build_constant_dose(size)
-        ref_grid = uniform_dose_builder(dose_ref)
-        offset_grid = uniform_dose_builder(dose_eval)
-        gamma = gamma_bruteforce_1d(ref_grid, offset_grid)
-        return gamma
+    @classmethod
+    def _gamma(cls, ref_grid, eval_grid) -> GammaResult:
+        return cls.gamma_func(ref_grid, eval_grid, cls.protocol)
 
-    @staticmethod
-    def get_square_feature(size: int, dose: float, shift: int) -> GammaResult:
-        square_feature_builder = Scenarios1d.build_square_feature(size, dose)
-        ref_grid = square_feature_builder(0)
-        eval_grid = square_feature_builder(shift)
-        return gamma_bruteforce_1d(ref_grid, eval_grid)
+    @classmethod
+    def get_uniform_offset(cls, size: int, dose_ref: float, dose_eval: float) -> GammaResult:
+        build = cls.builder.build_constant_dose(size)
+        return cls._gamma(build(dose_ref), build(dose_eval))
 
+    @classmethod
+    def get_square_feature(cls, size: int, dose: float, shift: int) -> GammaResult:
+        build = cls.builder.build_square_feature(size, dose)
+        return cls._gamma(build(0), build(shift))
 
-class GammaProvider2d:
+    @classmethod
+    def get_ramp(cls, size: int, slope: float, shift: int, dose_offset: float = 1.0) -> GammaResult:
+        build = cls.builder.build_ramp(size, slope, dose_offset)
+        return cls._gamma(build(0), build(shift))
 
-    @staticmethod
-    def get_uniform_offset(size, dose_ref, dose_eval) -> GammaResult:
-        uniform_dose_builder = Scenarios2d.build_constant_dose(size)
-        ref_grid = uniform_dose_builder(dose_ref)
-        offset_grid = uniform_dose_builder(dose_eval)
-        gamma = gamma_bruteforce_2d(ref_grid, offset_grid)
-        return gamma
-
-    @staticmethod
-    def get_square_feature(size: int, dose: float, shift: int) -> GammaResult:
-        square_feature_builder = Scenarios2d.build_square_feature(size, dose)
-        ref_grid = square_feature_builder(0)
-        eval_grid = square_feature_builder(shift)
-        return gamma_bruteforce_2d(ref_grid, eval_grid)
+    @classmethod
+    def set_context(cls, protocol: Protocol = protocol_regular, abs_dose_tolerance: float = ABSOLUTE_DOSE_TOLERANCE):
+        cls.protocol = replace(protocol, dose_tolerance_abs=abs_dose_tolerance)
 
 
-class GammaProvider3d:
+class GammaProvider1d(GammaProvider):
+    builder = Scenarios1d()
+    gamma_func = staticmethod(gamma_bruteforce_1d)
 
-    @staticmethod
-    def get_uniform_offset(size, dose_ref, dose_eval) -> GammaResult:
-        uniform_dose_builder = Scenarios3d.build_constant_dose(size)
-        ref_grid = uniform_dose_builder(dose_ref)
-        offset_grid = uniform_dose_builder(dose_eval)
-        gamma = gamma_bruteforce_3d(ref_grid, offset_grid)
-        return gamma
 
-    @staticmethod
-    def get_square_feature(size: int, dose: float, shift: int) -> GammaResult:
-        square_feature_builder = Scenarios3d.build_square_feature(size, dose)
-        ref_grid = square_feature_builder(0)
-        eval_grid = square_feature_builder(shift)
-        return gamma_bruteforce_3d(ref_grid, eval_grid)
+class GammaProvider2d(GammaProvider):
+    builder = Scenarios2d()
+    gamma_func = staticmethod(gamma_bruteforce_2d)
+
+
+class GammaProvider3d(GammaProvider):
+    builder = Scenarios3d()
+    gamma_func = staticmethod(gamma_bruteforce_3d)

@@ -1,66 +1,38 @@
 import numpy as np
 
-from turbogamma.classes import Protocol, DoseGrid, GammaResult, DOSE_TOLERANCE_PERCENT, DTA, protocol_regular
+from turbogamma.classes import Protocol, DoseGrid, GammaResult, protocol_regular
 
 
-def gamma_bruteforce_1d(ref_grid: DoseGrid, eval_grid: DoseGrid, protocol: Protocol = protocol_regular,
-                        dose_tolerance_abs: float = None) -> GammaResult:
+def _dose_tolerance_abs(protocol: Protocol, ref_dose_kept: np.ndarray, max_dose_ref_grid: float):
+    if protocol.dose_tolerance_abs is not None:
+        return protocol.dose_tolerance_abs
+    if protocol.local:
+        return protocol.dose_difference / 100 * ref_dose_kept.reshape((-1, 1))
+    return protocol.dose_difference / 100 * max_dose_ref_grid  # single scalar
+
+
+def gamma_bruteforce(ref_grid: DoseGrid, eval_grid: DoseGrid,
+                     protocol: Protocol = protocol_regular) -> GammaResult:
+    """Brute-force gamma index for grids of any dimensionality."""
     max_dose_ref_grid = ref_grid.dose.max()
 
     cutoff_threshold = protocol.dose_threshold * max_dose_ref_grid / 100
     mask = ref_grid.dose >= cutoff_threshold  # points to KEEP
 
-    ref_pos_row = ref_grid.coordinates[0]
-    ref_pos_kept = ref_pos_row[mask]
+    # Position: one row per kept reference point, one column per evaluation point
+    ref_axes = np.meshgrid(*ref_grid.coordinates, indexing='ij')
+    pos_ref_kept = np.stack([axis[mask] for axis in ref_axes], axis=-1)
+
+    eval_axes = np.meshgrid(*eval_grid.coordinates, indexing='ij')
+    pos_eval_flatten = np.stack([axis.flatten() for axis in eval_axes], axis=-1)
+
+    sq_dist = ((pos_ref_kept[:, None, :] - pos_eval_flatten) ** 2).sum(axis=-1)
+
+    # Dose
     ref_dose_kept = ref_grid.dose[mask]
-    ref_pos_col = ref_pos_kept.reshape((len(ref_pos_kept), 1))
-    eval_pos_row = eval_grid.coordinates[0]
-    ref_dose_col = ref_dose_kept.reshape((len(ref_pos_kept), 1))
-    dose_diff = ref_dose_col - eval_grid.dose
-    pos_diff = ref_pos_col - eval_pos_row
+    dose_diff = ref_dose_kept[:, None] - eval_grid.dose.flatten()
 
-    percent = protocol.dose_difference / 100
-    if dose_tolerance_abs is None:
-        if protocol.local:
-            dose_tolerance_abs = percent * ref_dose_kept.reshape((-1, 1))
-        else:
-            dose_tolerance_abs = percent * max_dose_ref_grid  # single scalar
-
-    gammas: np.ndarray = np.sqrt((dose_diff / dose_tolerance_abs) ** 2 + (pos_diff / protocol.dta) ** 2)
-    gamma = gammas.min(axis=1)
-    gamma_full = np.full(ref_grid.dose.shape, np.nan)
-    gamma_full[mask] = gamma
-    return GammaResult(ref_grid=ref_grid, eval_grid=eval_grid, gamma=gamma_full)
-
-
-def gamma_bruteforce_2d(ref_grid: DoseGrid, eval_grid: DoseGrid, protocol: Protocol = protocol_regular,
-                        dose_tolerance_abs: float = None) -> GammaResult:
-    max_dose_ref_grid = ref_grid.dose.max()
-
-    cutoff_threshold = protocol.dose_threshold * max_dose_ref_grid / 100
-    mask = ref_grid.dose >= cutoff_threshold  # points to KEEP
-
-    # Position first
-    xx_pos_ref, yy_pos_ref = np.meshgrid(ref_grid.coordinates[0], ref_grid.coordinates[1], indexing='ij')
-    pos_ref_kept = np.stack([xx_pos_ref[mask], yy_pos_ref[mask]], axis=-1)
-
-    xx_pos_eval, yy_pos_eval = np.meshgrid(eval_grid.coordinates[0], eval_grid.coordinates[1], indexing='ij')
-    pos_eval_flatten = np.stack([xx_pos_eval.flatten(), yy_pos_eval.flatten()], axis=-1)
-
-    dist_diff = pos_ref_kept[:, None, :] - pos_eval_flatten
-    sq_dist = (dist_diff ** 2).sum(axis=-1)
-
-    # Dose then
-    ref_dose_kept = ref_grid.dose[mask]
-    dose_eval_flatten = eval_grid.dose.flatten()
-    dose_diff = ref_dose_kept[:, None] - dose_eval_flatten
-
-    percent = protocol.dose_difference / 100
-    if dose_tolerance_abs is None:
-        if protocol.local:
-            dose_tolerance_abs = percent * ref_dose_kept.reshape((-1, 1))
-        else:
-            dose_tolerance_abs = percent * max_dose_ref_grid  # single scalar
+    dose_tolerance_abs = _dose_tolerance_abs(protocol, ref_dose_kept, max_dose_ref_grid)
 
     gammas = np.sqrt((dose_diff / dose_tolerance_abs) ** 2 + (np.sqrt(sq_dist) / protocol.dta) ** 2)
     gamma = gammas.min(axis=1)
@@ -70,26 +42,6 @@ def gamma_bruteforce_2d(ref_grid: DoseGrid, eval_grid: DoseGrid, protocol: Proto
     return GammaResult(ref_grid=ref_grid, eval_grid=eval_grid, gamma=gamma_full)
 
 
-def gamma_bruteforce_3d(ref_grid: DoseGrid, eval_grid: DoseGrid, dose_tolerance_abs: float = None) -> GammaResult:
-    if dose_tolerance_abs is None:
-        dose_tolerance_abs = DOSE_TOLERANCE_PERCENT * ref_grid.dose.max()
-
-    # Position first
-    xx_pos_ref, yy_pos_ref, zz_pos_ref = np.meshgrid(*ref_grid.coordinates, indexing='ij')
-    pos_ref_flatten = np.stack([xx_pos_ref.flatten(), yy_pos_ref.flatten(), zz_pos_ref.flatten()], axis=-1)
-
-    xx_pos_eval, yy_pos_eval, zz_pos_eval = np.meshgrid(*eval_grid.coordinates, indexing='ij')
-    pos_eval_flatten = np.stack([xx_pos_eval.flatten(), yy_pos_eval.flatten(), zz_pos_eval.flatten()], axis=-1)
-
-    dist_diff = pos_ref_flatten[:, None, :] - pos_eval_flatten
-    sq_dist = (dist_diff ** 2).sum(axis=-1)
-
-    # Dose then
-    dose_ref_flatten = ref_grid.dose.flatten()
-    dose_eval_flatten = eval_grid.dose.flatten()
-    dose_diff = dose_ref_flatten[:, None] - dose_eval_flatten
-
-    gammas = np.sqrt((dose_diff / dose_tolerance_abs) ** 2 + (np.sqrt(sq_dist) / DTA) ** 2)
-    gamma = gammas.min(axis=1).reshape(ref_grid.dose.shape)
-
-    return GammaResult(ref_grid=ref_grid, eval_grid=eval_grid, gamma=gamma)
+gamma_bruteforce_1d = gamma_bruteforce
+gamma_bruteforce_2d = gamma_bruteforce
+gamma_bruteforce_3d = gamma_bruteforce
