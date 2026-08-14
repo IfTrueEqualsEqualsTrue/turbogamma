@@ -3,8 +3,8 @@ from pathlib import Path
 
 import numpy as np
 
-from scripts.pmp_gamma import OUTPUT_DIR, compute_gammas, protocol_regular
-from turbogamma.gamma import GammaResult, DoseGrid, Protocol
+from scripts.pmp_gamma import OUTPUT_DIR, compute_gammas
+from turbogamma.classes import Protocol, DoseGrid, GammaResult
 
 
 def load_fixtures(protocol: Protocol) -> dict[str, GammaResult]:

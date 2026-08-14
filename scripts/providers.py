@@ -1,4 +1,5 @@
-from turbogamma.gamma import gamma_2d, GammaResult, gamma_1d, gamma_3d
+from turbogamma.gamma_bruteforce import gamma_bruteforce_2d, gamma_bruteforce_1d, gamma_bruteforce_3d
+from turbogamma.classes import GammaResult
 from turbogamma.scenarios import Scenarios2d, Scenarios1d, Scenarios3d
 
 
@@ -9,7 +10,7 @@ class GammaProvider1d:
         uniform_dose_builder = Scenarios1d.build_constant_dose(size)
         ref_grid = uniform_dose_builder(dose_ref)
         offset_grid = uniform_dose_builder(dose_eval)
-        gamma = gamma_1d(ref_grid, offset_grid)
+        gamma = gamma_bruteforce_1d(ref_grid, offset_grid)
         return gamma
 
     @staticmethod
@@ -17,7 +18,7 @@ class GammaProvider1d:
         square_feature_builder = Scenarios1d.build_square_feature(size, dose)
         ref_grid = square_feature_builder(0)
         eval_grid = square_feature_builder(shift)
-        return gamma_1d(ref_grid, eval_grid)
+        return gamma_bruteforce_1d(ref_grid, eval_grid)
 
 
 class GammaProvider2d:
@@ -27,7 +28,7 @@ class GammaProvider2d:
         uniform_dose_builder = Scenarios2d.build_constant_dose(size)
         ref_grid = uniform_dose_builder(dose_ref)
         offset_grid = uniform_dose_builder(dose_eval)
-        gamma = gamma_2d(ref_grid, offset_grid)
+        gamma = gamma_bruteforce_2d(ref_grid, offset_grid)
         return gamma
 
     @staticmethod
@@ -35,7 +36,7 @@ class GammaProvider2d:
         square_feature_builder = Scenarios2d.build_square_feature(size, dose)
         ref_grid = square_feature_builder(0)
         eval_grid = square_feature_builder(shift)
-        return gamma_2d(ref_grid, eval_grid)
+        return gamma_bruteforce_2d(ref_grid, eval_grid)
 
 
 class GammaProvider3d:
@@ -45,7 +46,7 @@ class GammaProvider3d:
         uniform_dose_builder = Scenarios3d.build_constant_dose(size)
         ref_grid = uniform_dose_builder(dose_ref)
         offset_grid = uniform_dose_builder(dose_eval)
-        gamma = gamma_3d(ref_grid, offset_grid)
+        gamma = gamma_bruteforce_3d(ref_grid, offset_grid)
         return gamma
 
     @staticmethod
@@ -53,4 +54,4 @@ class GammaProvider3d:
         square_feature_builder = Scenarios3d.build_square_feature(size, dose)
         ref_grid = square_feature_builder(0)
         eval_grid = square_feature_builder(shift)
-        return gamma_3d(ref_grid, eval_grid)
+        return gamma_bruteforce_3d(ref_grid, eval_grid)

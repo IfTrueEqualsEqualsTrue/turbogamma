@@ -6,7 +6,8 @@ from mpl_toolkits.mplot3d.art3d import Path3DCollection
 from scripts.golden_fixtures import load_fixtures
 from scripts.pmp_gamma import protocol_regular
 from scripts.providers import GammaProvider3d
-from turbogamma.gamma import DoseGrid, GammaResult, gamma_2d, gamma_1d
+from turbogamma.gamma_bruteforce import gamma_bruteforce_2d, gamma_bruteforce_1d
+from turbogamma.classes import DoseGrid, GammaResult
 
 POINT_SIZE = 100
 
@@ -97,7 +98,7 @@ def main_1d() -> None:
     size = target.ref_grid.dose.shape[0] // 2
     ref_grid = DoseGrid((target.ref_grid.coordinates[0],), target.ref_grid.dose[:, size])
     eval_grid = DoseGrid((target.eval_grid.coordinates[0],), target.eval_grid.dose[:, size])
-    gamma = gamma_1d(ref_grid, eval_grid, protocol_regular)
+    gamma = gamma_bruteforce_1d(ref_grid, eval_grid, protocol_regular)
     reference = GammaResult(gamma=target.gamma[:, size], ref_grid=ref_grid)
     plot_gamma_test(gamma_result=gamma, gamma_reference=reference)
 
@@ -106,8 +107,9 @@ def main_2d() -> None:
     # gamma = GammaProvider2d.get_square_feature(16, 2.0, 5)
     gammas = load_fixtures(protocol_regular)
     target = gammas["11_1"]
-    gamma = gamma_2d(target.ref_grid, target.eval_grid)
-    plot_gamma_test(gamma)
+    gamma = gamma_bruteforce_2d(target.ref_grid, target.eval_grid, protocol_regular)
+    reference = GammaResult(gamma=target.gamma, ref_grid=target.ref_grid)
+    plot_gamma_test(gamma_result=gamma, gamma_reference=reference)
 
 
 def main_3d() -> None:
@@ -115,4 +117,4 @@ def main_3d() -> None:
     plot_gamma_test(gamma)
 
 
-main_1d()
+main_2d()

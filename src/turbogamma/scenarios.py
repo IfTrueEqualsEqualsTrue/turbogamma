@@ -2,7 +2,7 @@ from typing import Callable
 
 import numpy as np
 
-from turbogamma.gamma import DTA, DoseGrid
+from turbogamma.classes import DoseGrid, DTA
 
 
 class Scenarios1d:

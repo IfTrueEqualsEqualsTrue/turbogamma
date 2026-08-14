@@ -9,7 +9,7 @@ import numpy as np
 import pymedphys as pmp
 
 from scripts.epi import read_epi_content_file
-from turbogamma.gamma import DoseGrid, GammaResult, Protocol
+from turbogamma.classes import Protocol, DoseGrid, GammaResult, protocol_regular
 
 banned_fixtures = [5, 7, 9, 14, 16, ]
 
@@ -18,8 +18,6 @@ DEFAULT_MAX_GAMMA = 3
 FIXTURE_DIR = os.path.join("..", "tests", "golden_fixtures")
 INPUT_DIR = os.path.join(FIXTURE_DIR, "input")
 OUTPUT_DIR = os.path.join(FIXTURE_DIR, "output")
-
-protocol_regular = Protocol(dose_difference=3, dta=3, dose_threshold=20)
 
 
 # pip install pymedphys[tests]==0.41.0
