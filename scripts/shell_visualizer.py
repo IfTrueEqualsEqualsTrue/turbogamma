@@ -124,5 +124,5 @@ def plot_shells(radius: float = 1.0, step: float = 0.2) -> None:
 if __name__ == "__main__":
     plot_shells(
         radius=1.0,
-        step=1.0,
+        step=0.05,
     )

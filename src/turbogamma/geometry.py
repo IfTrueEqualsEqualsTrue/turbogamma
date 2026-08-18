@@ -28,3 +28,20 @@ def shell_offsets(radius: float, step: float, n_dims: int) -> np.ndarray:  # (M,
         return np.concatenate(vectors)
     else:
         raise ValueError("n_dims should be 1, 2, or 3")
+
+
+def radii_schedule(dta: float, interp_fraction: int, d_max: float):
+    """ Generates the radii to visit to explore all the shells within d_max range, with a step of dta/interp_fraction"""
+    if interp_fraction < 1:
+        raise ValueError("Interpolation fraction should at least be 1")
+    elif type(interp_fraction) != int:
+        raise TypeError("Interpolation fraction should be an integer")
+    step = dta / interp_fraction
+    n = int(np.floor(d_max / step))
+    radii = np.arange(n + 1) * step
+    return radii
+
+
+a = radii_schedule(3.0, 1, 10)
+b = radii_schedule(3.0, 7, 10)
+print(a, b)

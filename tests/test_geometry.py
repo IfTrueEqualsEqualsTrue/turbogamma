@@ -2,7 +2,9 @@ import numpy as np
 import pytest
 from scipy.spatial import cKDTree
 
-from turbogamma.geometry import shell_offsets
+from turbogamma.geometry import shell_offsets, radii_schedule
+
+SCHEDULE_ATOL = 1e-6
 
 
 @pytest.fixture(params=[1, 2, 3], ids=lambda d: f"{d}d")
@@ -24,6 +26,26 @@ def step(request) -> float:
 @pytest.fixture
 def shell(radius: float, step: float, n_dims: int) -> np.ndarray:
     return shell_offsets(radius, step, n_dims)
+
+
+@pytest.fixture(params=[2.0, 3.0], ids=lambda d: f"dta{d}")
+def dta(request) -> float:
+    return request.param
+
+
+@pytest.fixture(params=[2, 10], ids=lambda i: f"i{i}")
+def interp_fraction(request) -> float:
+    return request.param
+
+
+@pytest.fixture(params=[1.0, 10.0], ids=lambda d: f"dmax{d}")
+def d_max(request) -> float:
+    return request.param
+
+
+@pytest.fixture
+def schedule(dta: float, interp_fraction: int, d_max: float) -> np.ndarray:
+    return radii_schedule(dta, interp_fraction, d_max)
 
 
 def max_neighbour_gap(points: np.ndarray) -> float:
@@ -91,3 +113,44 @@ class TestShell3d:
         poles = [(0.0, 0.0, radius), (0.0, 0.0, -radius)]
         distances, _indices = cKDTree(shell).query(poles)
         assert distances.max() < 1e-9
+
+
+class TestRadiiSchedule:
+
+    def test_starts_at_zero(self, schedule):
+        assert schedule[0] == pytest.approx(0.0, abs=SCHEDULE_ATOL)
+
+    def test_raises_on_null_interp_factor(self):
+        with pytest.raises(ValueError):
+            radii_schedule(3.0, 0, 10.0)
+
+    def test_raises_on_uninteger_interp_factor(self):
+        with pytest.raises(TypeError):
+            radii_schedule(3.0, 1.5, 10.0)
+
+    def test_sctricly_increasing(self, schedule):
+        assert np.all(np.diff(schedule) > 0)
+
+    def test_dmax_bound(self, schedule, d_max):
+        assert schedule[-1] <= d_max
+
+    def test_gap_smaller_than_step(self, schedule, dta, interp_fraction):
+        step = dta / interp_fraction
+        assert np.all(np.diff(schedule) <= step + SCHEDULE_ATOL)
+
+    @pytest.mark.parametrize("d_max", [0.0])
+    def test_null_dmax(self, schedule):
+        assert len(schedule) == 1
+        assert schedule[0] == [0.0]
+
+    def test_mutliples_of_dta_are_present(self, schedule, dta, d_max):
+        n_dta = int(np.floor(d_max / dta)) + 1
+        targets_dta = np.arange(n_dta) * dta
+        diffs = np.abs(schedule[:, None] - targets_dta).min(axis=0)  # Distances of the target to their closest match
+        assert np.all(diffs < SCHEDULE_ATOL)
+
+    @pytest.mark.parametrize("interp_fraction", [1])
+    def test_unity_interp_fraction(self, schedule, dta, d_max):
+        n_dta = int(np.floor(d_max / dta)) + 1
+        assert len(schedule) == n_dta
+        assert np.allclose(schedule, dta * np.arange(n_dta), atol=SCHEDULE_ATOL)
