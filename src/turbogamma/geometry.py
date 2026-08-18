@@ -2,11 +2,9 @@ from math import ceil
 
 import numpy as np
 from numpy import pi
-from numpy._typing import NDArray
-from scipy.spatial import cKDTree
 
 
-def shell_offsets(radius: float, step: float, n_dims: int) -> NDArray[np.float64]:  # (M, n_dims)
+def shell_offsets(radius: float, step: float, n_dims: int) -> np.ndarray:  # (M, n_dims)
     if radius == 0.0:
         return np.zeros((1, n_dims))
     if n_dims == 1:
@@ -30,5 +28,3 @@ def shell_offsets(radius: float, step: float, n_dims: int) -> NDArray[np.float64
         return np.concatenate(vectors)
     else:
         raise ValueError("n_dims should be 1, 2, or 3")
-
-
