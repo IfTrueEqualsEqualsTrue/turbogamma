@@ -32,7 +32,7 @@ def constant_dose_volume() -> Callable:
     return Scenarios3d().build_constant_dose(ARRAY_SIZE)
 
 
-class TestGamma1d:
+class TestGammaBruteforce1d:
 
     def test_uniform_dose_offset(self, constant_dose_line):
         base_dose = constant_dose_line(BASE_CONSTANT_DOSE)
@@ -49,7 +49,7 @@ class TestGamma1d:
         np.testing.assert_allclose(gamma_result.gamma, np.array([GAMMA_TRADEOFF]), atol=1e-1)
 
 
-class TestGamma2d:
+class TestGammaBruteforce2d:
 
     def test_uniform_dose_offset(self, constant_dose_grid):
         base_dose = constant_dose_grid(BASE_CONSTANT_DOSE)
@@ -60,7 +60,7 @@ class TestGamma2d:
             atol=ATOL)
 
 
-class TestGamma3d:
+class TestGammaBruteforce3d:
 
     def test_uniform_dose_offset(self, constant_dose_volume):
         base_dose = constant_dose_volume(BASE_CONSTANT_DOSE)

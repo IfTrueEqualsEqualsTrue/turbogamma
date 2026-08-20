@@ -11,4 +11,4 @@ wheels/
 .idea
 #tests/golden_fixtures/
 .env
-.benchmarks
+.benchmarksé

@@ -1,14 +1,6 @@
 import numpy as np
 
-from turbogamma.classes import Protocol, DoseGrid, GammaResult, protocol_regular
-
-
-def _dose_tolerance_abs(protocol: Protocol, ref_dose_kept: np.ndarray, max_dose_ref_grid: float):
-    if protocol.dose_tolerance_abs is not None:
-        return protocol.dose_tolerance_abs
-    if protocol.local:
-        return protocol.dose_difference / 100 * ref_dose_kept.reshape((-1, 1))
-    return protocol.dose_difference / 100 * max_dose_ref_grid  # single scalar
+from turbogamma.classes import Protocol, DoseGrid, GammaResult, protocol_regular, resolve_dose_tolerance
 
 
 def gamma_bruteforce(ref_grid: DoseGrid, eval_grid: DoseGrid,
@@ -32,7 +24,7 @@ def gamma_bruteforce(ref_grid: DoseGrid, eval_grid: DoseGrid,
     ref_dose_kept = ref_grid.dose[mask]
     dose_diff = ref_dose_kept[:, None] - eval_grid.dose.flatten()
 
-    dose_tolerance_abs = _dose_tolerance_abs(protocol, ref_dose_kept, max_dose_ref_grid)
+    dose_tolerance_abs = resolve_dose_tolerance(protocol, ref_dose_kept.reshape((-1, 1)), max_dose_ref_grid)
 
     gammas = np.sqrt((dose_diff / dose_tolerance_abs) ** 2 + (np.sqrt(sq_dist) / protocol.dta) ** 2)
     gamma = gammas.min(axis=1)

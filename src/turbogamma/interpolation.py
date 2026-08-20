@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Protocol as TypingProtocol
 
 import numpy as np
-from numpy._typing import NDArray
+from numpy.typing import NDArray
 from scipy.interpolate import RegularGridInterpolator
 
 from turbogamma.classes import DoseGrid

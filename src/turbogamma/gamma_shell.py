@@ -1,28 +1,34 @@
 import numpy as np
 
-from turbogamma.classes import DoseGrid, Protocol
+from turbogamma.classes import DoseGrid, Protocol, GammaSearchResult, GammaResult
 from turbogamma.geometry import radii_schedule, shell_offsets
 from turbogamma.interpolation import build_query
 
-max_gamma = 3.0
 
-
-def find_best_gamma(ref_grid: DoseGrid, eval_grid: DoseGrid, protocol: Protocol) -> float:
+def find_best_gamma(r_ref: np.ndarray, dose_ref: float, dose_tolerance_abs: float, eval_grid: DoseGrid,
+                    protocol: Protocol) -> GammaSearchResult:
     gamma_sq_best: np.float64 = float("inf")
     ndim = len(eval_grid.coordinates)
-    d_max = max_gamma * protocol.dta
-    interp_query, spacings = build_query(eval_grid)
-    schedule = radii_schedule(protocol.dta, protocol.interp_fraction, d_max)
+    d_max = protocol.max_gamma * protocol.dta
+    interp_query, _ = build_query(eval_grid)
+    schedule, step = radii_schedule(protocol.dta, protocol.interp_fraction, d_max)
+    shells_visited = 0
+    last_d = None
     for d in schedule:
-        if gamma_sq_best < (d / protocol.dta) ** 2:
+        if gamma_sq_best <= (d / protocol.dta) ** 2:
             break
-        else:
-            cached_offsets = shell_offsets(d, protocol.dta / protocol.interp_fraction, ndim)
-            interpolated_eval_points = interp_query(cached_offsets)
-            dose_value =
 
-    return gamma_sq_best
+        cached_offsets = shell_offsets(d, step, ndim)
+        interpolated_eval_points = interp_query(r_ref + cached_offsets)
+        dose_terms = np.abs(interpolated_eval_points - dose_ref)
+        min_dose_term = np.min(dose_terms, axis=-1)
+        gamma_sq = (d / protocol.dta) ** 2 + (min_dose_term / dose_tolerance_abs) ** 2
+        gamma_sq_best = min(gamma_sq, gamma_sq_best)
+        shells_visited += 1
+        last_d = d
+
+    return GammaSearchResult(np.sqrt(gamma_sq_best), shells_visited, last_d)
 
 
-ref_grid = DoseGrid((np.array([0.0]), (np.array([0.0])), np.array([2.0])))
-eval_grid = DoseGrid((np.array([0.5, 2, 10]),), np.array([10, 2, 0.5]))
+def gamma_shell(ref_grid: DoseGrid, eval_grid: DoseGrid, protocol: Protocol) -> GammaResult:
+    raise NotImplementedError

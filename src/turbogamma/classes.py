@@ -44,3 +44,17 @@ class GammaResult:
     gamma: np.ndarray = None
     protocol: Protocol = None
     id: str = ""
+
+
+@dataclass(frozen=True)
+class GammaSearchResult:
+    gamma: float
+    shells_visited: int
+    terminating_radius: float
+
+def resolve_dose_tolerance(protocol: Protocol, ref_dose: np.ndarray, max_dose_ref_grid: float):
+    if protocol.dose_tolerance_abs is not None:
+        return protocol.dose_tolerance_abs
+    if protocol.local:
+        return protocol.dose_difference / 100 * ref_dose
+    return protocol.dose_difference / 100 * max_dose_ref_grid  # single scalar
