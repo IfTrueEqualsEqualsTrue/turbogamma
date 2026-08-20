@@ -40,8 +40,3 @@ def radii_schedule(dta: float, interp_fraction: int, d_max: float):
     n = int(np.floor(d_max / step))
     radii = np.arange(n + 1) * step
     return radii, step
-
-
-a = radii_schedule(3.0, 1, 10)
-b = radii_schedule(3.0, 7, 10)
-print(a, b)

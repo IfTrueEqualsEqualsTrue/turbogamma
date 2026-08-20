@@ -1,5 +1,5 @@
-from math import sqrt
 from dataclasses import dataclass
+from math import sqrt
 
 import numpy as np
 
@@ -52,7 +52,10 @@ class GammaSearchResult:
     shells_visited: int
     terminating_radius: float
 
+
 def resolve_dose_tolerance(protocol: Protocol, ref_dose: np.ndarray, max_dose_ref_grid: float):
+    """ Returns either a flat dose float for global and overriden absolude dose tolerance in protocol, or an array
+    with local ref dose tolerance"""
     if protocol.dose_tolerance_abs is not None:
         return protocol.dose_tolerance_abs
     if protocol.local:

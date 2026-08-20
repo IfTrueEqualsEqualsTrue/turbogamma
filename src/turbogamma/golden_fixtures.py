@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-from scripts.pmp_gamma import OUTPUT_DIR, compute_gammas
+from pmp_gamma import OUTPUT_DIR, compute_gammas
 from turbogamma.classes import Protocol, DoseGrid, GammaResult
 
 

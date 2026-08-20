@@ -3,8 +3,10 @@ import numpy as np
 from matplotlib.collections import QuadMesh
 from mpl_toolkits.mplot3d.art3d import Path3DCollection
 
-from scripts.providers import GammaProvider3d, GammaProvider1d, GammaProvider2d
-from turbogamma.classes import DoseGrid, GammaResult, ABSOLUTE_DOSE_TOLERANCE, Protocol
+from providers import GammaProvider3d, GammaProvider1d, GammaProvider2d
+from turbogamma.classes import DoseGrid, GammaResult, Protocol, protocol_regular
+from turbogamma.gamma_shell import gamma_shell
+from turbogamma.golden_fixtures import load_fixtures
 
 POINT_SIZE = 100
 
@@ -119,6 +121,20 @@ def main_3d() -> None:
     plot_gamma(gamma)
 
 
+def plot_golden_fixture_comparison(prefix: str, protocol: Protocol = protocol_regular) -> None:
+    """Load a golden fixture by prefix and compare turbogamma's gamma_shell
+    against the pre-computed pymedphys reference on the same ref/eval maps."""
+    fixtures = load_fixtures(protocol)
+    if prefix not in fixtures:
+        raise KeyError(f"no fixture found for prefix '{prefix}', available: {sorted(fixtures)}")
+
+    reference = fixtures[prefix]
+    result = gamma_shell(reference.ref_grid, reference.eval_grid, protocol)
+
+    plot_gamma(gamma_result=result, gamma_reference=reference)
+
+
 # main_1d()
-main_2d()
+# main_2d()
 # main_3d()
+plot_golden_fixture_comparison("10_1")

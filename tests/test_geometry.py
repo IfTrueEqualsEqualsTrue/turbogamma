@@ -45,7 +45,8 @@ def d_max(request) -> float:
 
 @pytest.fixture
 def schedule(dta: float, interp_fraction: int, d_max: float) -> np.ndarray:
-    return radii_schedule(dta, interp_fraction, d_max)
+    radii, _step = radii_schedule(dta, interp_fraction, d_max)
+    return radii
 
 
 def max_neighbour_gap(points: np.ndarray) -> float:
