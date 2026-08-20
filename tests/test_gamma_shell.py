@@ -6,7 +6,7 @@ import pytest
 from turbogamma.classes import DoseGrid, Protocol
 from turbogamma.gamma_bruteforce import gamma_bruteforce
 from turbogamma.gamma_shell import find_best_gamma, gamma_shell
-from turbogamma.golden_fixtures import load_fixtures
+from turbogamma_tools.golden_fixtures import load_fixtures
 
 GRID_SIZE = 10
 SPACING = 2.0

@@ -3,7 +3,7 @@ from typing import Callable
 
 from turbogamma.classes import DoseGrid, GammaResult, Protocol, protocol_regular, ABSOLUTE_DOSE_TOLERANCE
 from turbogamma.gamma_bruteforce import gamma_bruteforce_1d, gamma_bruteforce_2d, gamma_bruteforce_3d
-from turbogamma.scenarios import Scenarios1d, Scenarios2d, Scenarios3d
+from turbogamma_tools.scenarios import Scenarios1d, Scenarios2d, Scenarios3d
 
 
 class GammaProvider:

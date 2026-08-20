@@ -3,10 +3,10 @@ import numpy as np
 from matplotlib.collections import QuadMesh
 from mpl_toolkits.mplot3d.art3d import Path3DCollection
 
-from providers import GammaProvider3d, GammaProvider1d, GammaProvider2d
+from turbogamma_tools.providers import GammaProvider3d, GammaProvider1d, GammaProvider2d
 from turbogamma.classes import DoseGrid, GammaResult, Protocol, protocol_regular
 from turbogamma.gamma_shell import gamma_shell
-from turbogamma.golden_fixtures import load_fixtures
+from turbogamma_tools.golden_fixtures import load_fixtures
 
 POINT_SIZE = 100
 
@@ -137,4 +137,4 @@ def plot_golden_fixture_comparison(prefix: str, protocol: Protocol = protocol_re
 # main_1d()
 # main_2d()
 # main_3d()
-plot_golden_fixture_comparison("5_1")
+plot_golden_fixture_comparison("4_1")

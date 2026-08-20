@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pymedphys as pmp
 
-from turbogamma.epi import read_epi_content_file
+from turbogamma_tools.epi import read_epi_content_file
 from turbogamma.classes import Protocol, DoseGrid, GammaResult, protocol_regular
 
 banned_fixtures = [5, 7, 9, 14, 16, ]

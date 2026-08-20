@@ -13,12 +13,19 @@ dependencies = [
     "scipy>=1.18.0",
 ]
 
+[project.optional-dependencies]
+viz = ["matplotlib>=3.11.1"]
+pmp = ["pymedphys[tests]==0.41.0"]
+
 [project.scripts]
 turbogamma = "turbogamma:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = ["turbogamma", "turbogamma_tools"]
 
 [dependency-groups]
 dev = [

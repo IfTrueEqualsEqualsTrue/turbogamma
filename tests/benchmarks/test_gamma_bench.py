@@ -2,7 +2,7 @@ import pytest
 from pytest_benchmark.plugin import benchmark
 
 from turbogamma.gamma_bruteforce import gamma_bruteforce_1d, gamma_bruteforce_2d, gamma_bruteforce_3d
-from turbogamma.scenarios import Scenarios1d, Scenarios3d, Scenarios2d
+from turbogamma_tools.scenarios import Scenarios1d, Scenarios3d, Scenarios2d
 
 DOSE_REF = 1.0
 DOSE_EVAL = 2.0

@@ -658,6 +658,14 @@ dependencies = [
     { name = "scipy" },
 ]
 
+[package.optional-dependencies]
+pmp = [
+    { name = "pymedphys", extra = ["tests"] },
+]
+viz = [
+    { name = "matplotlib" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "matplotlib" },
@@ -671,10 +679,13 @@ pmp = [
 
 [package.metadata]
 requires-dist = [
+    { name = "matplotlib", marker = "extra == 'viz'", specifier = ">=3.11.1" },
     { name = "numpy", specifier = ">=2.5.2" },
+    { name = "pymedphys", extras = ["tests"], marker = "extra == 'pmp'", specifier = "==0.41.0" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "scipy", specifier = ">=1.18.0" },
 ]
+provides-extras = ["viz", "pmp"]
 
 [package.metadata.requires-dev]
 dev = [
