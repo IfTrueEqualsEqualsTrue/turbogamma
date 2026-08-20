@@ -8,14 +8,15 @@ from pathlib import Path
 import numpy as np
 import pymedphys as pmp
 
-from epi import read_epi_content_file
+from turbogamma.epi import read_epi_content_file
 from turbogamma.classes import Protocol, DoseGrid, GammaResult, protocol_regular
 
 banned_fixtures = [5, 7, 9, 14, 16, ]
 
 DEFAULT_RAM = 12
 DEFAULT_MAX_GAMMA = 3
-FIXTURE_DIR = os.path.join("../..", "tests", "golden_fixtures")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+FIXTURE_DIR = os.path.join(PROJECT_ROOT, "tests", "golden_fixtures")
 INPUT_DIR = os.path.join(FIXTURE_DIR, "input")
 OUTPUT_DIR = os.path.join(FIXTURE_DIR, "output")
 

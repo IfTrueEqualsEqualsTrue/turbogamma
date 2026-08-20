@@ -137,4 +137,4 @@ def plot_golden_fixture_comparison(prefix: str, protocol: Protocol = protocol_re
 # main_1d()
 # main_2d()
 # main_3d()
-plot_golden_fixture_comparison("10_1")
+plot_golden_fixture_comparison("5_1")

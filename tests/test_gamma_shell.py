@@ -6,6 +6,7 @@ import pytest
 from turbogamma.classes import DoseGrid, Protocol
 from turbogamma.gamma_bruteforce import gamma_bruteforce
 from turbogamma.gamma_shell import find_best_gamma, gamma_shell
+from turbogamma.golden_fixtures import load_fixtures
 
 GRID_SIZE = 10
 SPACING = 2.0
@@ -263,24 +264,24 @@ class TestGammaShell:
         interior = slice(2, -2)  # avoid edge effects
         assert np.all(result_bruteforce.gamma[interior] >= result_shell.gamma[interior] - 1e-9)
 
-    # @staticmethod
-    # def test_matches_pymedphys_golden_fixtures(protocol):
-    #     """Compare gamma_shell against pre-computed pymedphys fixtures across
-    #     real dose maps. Different discretization, so compare within tolerance,
-    #     not exact — both per-point distribution and pass-rate."""
-    #
-    #     protocol_golden = dataclasses.replace(protocol, dose_tolerance_abs=None, dose_threshold=20)
-    #     fixtures = load_fixtures(protocol_golden)
-    #
-    #     for prefix, fixture in fixtures.items():
-    #         result = gamma_shell(fixture.ref_grid, fixture.eval_grid, protocol_golden)
-    #
-    #         valid = ~np.isnan(fixture.gamma) & ~np.isnan(result.gamma)
-    #         diff = np.abs(result.gamma[valid] - fixture.gamma[valid])
-    #
-    #         assert np.median(diff) < 0.05, f"{prefix}: median diff too high"
-    #         assert np.percentile(diff, 95) < 0.2, f"{prefix}: 95th pct diff too high"
-    #
-    #         pass_rate_shell = np.mean(result.gamma[valid] < 1)
-    #         pass_rate_pymedphys = np.mean(fixture.gamma[valid] < 1)
-    #         assert abs(pass_rate_shell - pass_rate_pymedphys) < 1, f"{prefix}: pass rate mismatch"
+    @staticmethod
+    def test_matches_pymedphys_golden_fixtures(protocol):
+        """Compare gamma_shell against pre-computed pymedphys fixtures across
+        real dose maps. Different discretization, so compare within tolerance,
+        not exact — both per-point distribution and pass-rate."""
+
+        protocol_golden = dataclasses.replace(protocol, dose_tolerance_abs=None, dose_threshold=20)
+        fixtures = load_fixtures(protocol_golden)
+
+        for prefix, fixture in fixtures.items():
+            result = gamma_shell(fixture.ref_grid, fixture.eval_grid, protocol_golden)
+
+            valid = ~np.isnan(fixture.gamma) & ~np.isnan(result.gamma)
+            diff = np.abs(result.gamma[valid] - fixture.gamma[valid])
+
+            assert np.median(diff) < 0.05, f"{prefix}: median diff too high"
+            assert np.percentile(diff, 95) < 0.2, f"{prefix}: 95th pct diff too high"
+
+            pass_rate_shell = np.mean(result.gamma[valid] < 1)
+            pass_rate_pymedphys = np.mean(fixture.gamma[valid] < 1)
+            assert abs(pass_rate_shell - pass_rate_pymedphys) < 0.05, f"{prefix}: pass rate mismatch"
