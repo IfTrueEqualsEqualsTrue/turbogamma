@@ -4,9 +4,13 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/iftrueequalsequalstrue/turbogamma">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
+  <p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/IfTrueEqualsEqualsTrue/turbogamma/tree/master/images/dark_logo.png">
+      <source media="(prefers-color-scheme: light)" srcset="https://github.com/IfTrueEqualsEqualsTrue/turbogamma/tree/master/images/light_logo.png">
+      <img alt="Logo">
+    </picture>
+</p>
 
 <h3 align="center">TurboGamma</h3>
   <p align="center">
