@@ -6,10 +6,10 @@
 <div align="center">
   <p align="center">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/IfTrueEqualsEqualsTrue/turbogamma/tree/master/images/dark_logo.png">
-      <source media="(prefers-color-scheme: light)" srcset="https://github.com/IfTrueEqualsEqualsTrue/turbogamma/tree/master/images/light_logo.png">
-      <img alt="Logo">
-    </picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/IfTrueEqualsEqualsTrue/turbogamma/master/images/dark_logo.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/IfTrueEqualsEqualsTrue/turbogamma/master/images/light_logo.png">
+  <img alt="Logo" src="https://raw.githubusercontent.com/IfTrueEqualsEqualsTrue/turbogamma/master/images/light_logo.png" width="200">
+</picture>
 </p>
 
 <h3 align="center">TurboGamma</h3>
@@ -48,42 +48,33 @@
 
 
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
-
-
-
 
 ### Built With
 
-
 <!-- GETTING STARTED -->
+
 ## Getting Started
-
-
 
 ### Prerequisites
 
-
 ### Installation
 
-
-
 <!-- USAGE EXAMPLES -->
+
 ## Usage
 
-
-
 <!-- ROADMAP -->
+
 ## Roadmap
 
-
-
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
-
-
 <!-- LICENSE -->
+
 ## License
 
 Distributed under the MIT license. See `LICENSE.txt` for more information.
@@ -91,6 +82,7 @@ Distributed under the MIT license. See `LICENSE.txt` for more information.
 
 
 <!-- CONTACT -->
+
 ## Contact
 
 
