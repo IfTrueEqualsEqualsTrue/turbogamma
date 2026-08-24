@@ -1,0 +1,26 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="256" height="256" fill="#17181B"/>
+<path d="M203.794 178.154C196.448 178.154 190.58 176.056 186.192 171.859C181.899 167.566 179.752 161.795 179.752 154.545V115.624H158V99.4553H179.752V77.2764H197.783V99.4553H229.123V115.624H197.783V154.115C197.783 156.405 198.403 158.313 199.644 159.839C200.979 161.27 202.792 161.985 205.082 161.985H228.408V178.154H203.794Z" fill="white"/>
+<mask id="mask0_4_24" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="26" y="77" width="147" height="102">
+<rect x="26" y="77" width="147" height="102" fill="url(#paint0_radial_4_24)"/>
+</mask>
+<g mask="url(#mask0_4_24)">
+<path d="M151 113L26 107.5L151 102V113Z" fill="#33EAF0"/>
+<path d="M173 133L43 127.5L173 122V133Z" fill="#33EAF0"/>
+<path d="M173 154L70 148L173 142V154Z" fill="#33EAF0"/>
+<path d="M173 176L79 170.5L173 165V176Z" fill="#33EAF0"/>
+<rect x="55" y="78" width="6" height="64" fill="#33EAF0"/>
+<rect x="31" y="78" width="6" height="51" fill="#33EAF0"/>
+<path d="M79 78H85V179H79V78Z" fill="#33EAF0"/>
+<path d="M103 79H109V180H103V79Z" fill="#33EAF0"/>
+</g>
+<path d="M26 134C31.8501 134 37.6428 135.152 43.0475 137.391C48.4522 139.629 53.363 142.91 57.4995 147.046C61.636 151.182 64.9172 156.092 67.1558 161.496C69.3944 166.9 70.5466 172.692 70.5466 178.541" stroke="white" stroke-width="16"/>
+<ellipse cx="33.8261" cy="170.825" rx="7.82609" ry="7.8252" fill="white"/>
+<defs>
+<radialGradient id="paint0_radial_4_24" cx="0" cy="0" r="1" gradientTransform="matrix(129.218 -88 126.824 132.51 34.2984 174)" gradientUnits="userSpaceOnUse">
+<stop offset="0.320873" stop-color="#4EE1E6" stop-opacity="0"/>
+<stop offset="0.685455" stop-color="#4EE1E6"/>
+<stop offset="1" stop-color="#4EE1E6"/>
+</radialGradient>
+</defs>
+</svg>
