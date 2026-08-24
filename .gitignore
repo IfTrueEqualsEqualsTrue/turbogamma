@@ -12,3 +12,4 @@ wheels/
 #tests/golden_fixtures/
 .env
 .benchmarksé
+/tests/golden_fixtures/
